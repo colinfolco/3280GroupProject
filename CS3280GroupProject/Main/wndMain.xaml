@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Button Name="btnEditItems" Content="Items" Click="btnEditItems_Click" Margin="5"/>
+            <Button Name="btnSearchInvoice" Content="Search" Click="btnSearchInvoice_Click" Margin="5"/>
+        </StackPanel>
     </Grid>
 </Window>

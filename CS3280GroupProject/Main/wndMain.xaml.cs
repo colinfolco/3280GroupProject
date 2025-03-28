@@ -1,4 +1,5 @@
 ﻿using CS3280GroupProject.Items;
+using CS3280GroupProject.Search;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,20 +23,18 @@ namespace CS3280GroupProject
             InitializeComponent();
         }
 
-       private void mnuEditItems_Click(object sender, RoutedEventArgs e)
+        private void btnEditItems_Click(object sender, RoutedEventArgs e)
         {
+            // Open the Items window as a modal dialog
             var itemsWindow = new wndItems();
-            itemsWindow.ShowDialog(); // Modal dialog
+            itemsWindow.ShowDialog();
+        }
 
-            if (itemsWindow.ItemsModified)
-            {
-                /* 
-                 * When Items window closes with changes:
-                 * 1. Refresh combo box using clsMainLogic
-                 * 2. Reload items from database
-                 */
-               //freshItemsComboBox();
-            }
+        private void btnSearchInvoice_Click(object sender, RoutedEventArgs e)
+        {
+            // Open the Search window as a modal dialog
+            var searchWindow = new wndSearch();
+            searchWindow.ShowDialog();
         }
     }
 }
