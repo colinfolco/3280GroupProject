@@ -1,0 +1,28 @@
+<Window x:Class="CS3280GroupProject.Items.wndItems"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit Items" Height="450" Width="800">
+    <Grid>
+        <!-- DataGrid for item listing -->
+        <DataGrid Name="dgItems" Margin="10" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Item Code" Binding="{Binding ItemID}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Name" Binding="{Binding ItemName}"/>
+                <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Edit Controls -->
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="10,40,10,0">
+            <TextBox Name="txtItemName" Width="200" Margin="5"/>
+            <TextBox Name="txtPrice" Width="100" Margin="5"/>
+            <Button Name="btnAdd" Content="Add Item" Click="btnAdd_Click"/>
+        </StackPanel>
+
+        <!-- Action Buttons -->
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="10">
+            <Button Name="btnSave" Content="Save" Width="80" Margin="5" Click="btnSave_Click"/>
+            <Button Name="btnCancel" Content="Cancel" Width="80" Margin="5" Click="btnCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

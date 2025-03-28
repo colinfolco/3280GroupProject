@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using CS3280GroupProject.Items;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,22 @@ namespace CS3280GroupProject
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+       private void mnuEditItems_Click(object sender, RoutedEventArgs e)
+        {
+            var itemsWindow = new wndItems();
+            itemsWindow.ShowDialog(); // Modal dialog
+
+            if (itemsWindow.ItemsModified)
+            {
+                /* 
+                 * When Items window closes with changes:
+                 * 1. Refresh combo box using clsMainLogic
+                 * 2. Reload items from database
+                 */
+               //freshItemsComboBox();
+            }
         }
     }
 }
