@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CS3280GroupProject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="900" Width="1200">
     <Grid>
-
+        <Button Name="btnSearchInvoice" Content="Search for Invoice" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,0,641,0"/>
+        <Button Name="btnEditItems" Content="Edit Items" Click="mnuEditItems_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60"/>
     </Grid>
 </Window>
