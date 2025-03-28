@@ -29,11 +29,5 @@ namespace CS3280GroupProject.Items
             // Close without saving
             this.Close();
         }
-
-        private void btnAdd_Click(object sender, RoutedEventArgs e)
-        {
-            // Placeholder method for btnAdd_Click
-            // Implementation will be added later
-        }
     }
 }
