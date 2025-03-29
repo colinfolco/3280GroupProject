@@ -5,11 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CS3280GroupProject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Button Name="btnEditItems" Content="Items" Click="btnEditItems_Click" Margin="5"/>
-            <Button Name="btnSearchInvoice" Content="Search" Click="btnSearchInvoice_Click" Margin="5"/>
+        Title="Invoice Management" Height="450" Width="800">
+
+    <!-- main grid -->
+    <Grid Margin="10">
+
+        <!-- top menu for search and edit items -->
+        <Menu VerticalAlignment="Top" HorizontalAlignment="Left">
+            <MenuItem Header="Search" Click="btnSearchInvoice_Click"/>
+            <MenuItem Header="Edit Items" Click="btnEditItems_Click"/>
+        </Menu>
+
+        <!-- buttons for creating and editing invoices -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0">
+            <Button Name="btnEditInvoice" Content="Edit Invoice" Click="btnEditInvoice_Click" Width="100" Margin="5"/>
+            <Button Name="btnCreateInvoice" Content="Save Invoice" Click="btnCreateInvoice_Click" Width="100" Margin="5"/>
         </StackPanel>
+
+        <!-- invoice details -->
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0">
+            <TextBlock Text="Invoice Date:" Margin="0,5,0,0"/>
+            <TextBox Name="txtInvoiceDate" Width="150" Margin="0,5,0,0"/>
+            <TextBlock Text="Invoice Number:" Margin="0,5,0,0"/>
+            <TextBox Name="txtInvoiceNumber" Width="150" Margin="0,5,0,0"/>
+            <TextBlock Text="Total Cost:" Margin="0,5,0,0"/>
+            <TextBox Name="txtTotalCost" Width="150" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <!-- item selection -->
+        <GroupBox Header="Items" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200,70,0,0" Width="300">
+            <StackPanel Margin="5">
+                <TextBlock Text="Items:" Margin="0,5,0,0"/>
+                <ComboBox Name="cmbItems" Width="200" Margin="0,5,0,0"/>
+                <TextBlock Text="Cost:" Margin="0,5,0,0"/>
+                <TextBox Name="txtItemCost" Width="200" Margin="0,5,0,0" IsReadOnly="True"/>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Button Name="btnAddItem" Content="Add Item" Click="btnAddItem_Click" Width="100" Margin="5"/>
+                    <Button Name="btnRemoveItem" Content="Remove Item" Click="btnRemoveItem_Click" Width="100" Margin="5"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- items in the invoice -->
+        <GroupBox Header="Items on Invoice" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,235,0,0" Width="760" Height="179">
+            <DataGrid Name="dgInvoiceItems" AutoGenerateColumns="True" Height="200" Margin="5"/>
+        </GroupBox>
+
     </Grid>
 </Window>

@@ -19,9 +19,25 @@ namespace CS3280GroupProject.Search
     /// </summary>
     public partial class wndSearch : Window
     {
+        // Dummy to hold the selected invoice ID
+        public string SelectedInvoiceID { get; private set; } = "12345";
         public wndSearch()
         {
             InitializeComponent();
+        }
+        private void btnSelectInvoice_Click(object sender, RoutedEventArgs e)
+        {
+            // For now, just set a static ID
+            SelectedInvoiceID = "12345";
+            this.DialogResult = true;
+            this.Close();
+        }
+
+        // Cancel button to close the window without selecting
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
         }
     }
 }
