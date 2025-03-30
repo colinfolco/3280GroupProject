@@ -9,6 +9,29 @@ namespace CS3280GroupProject.Items
 {
     public partial class wndItems : Window
     {
+        private clsItemsLogic itemsLogic = new clsItemsLogic();
+
+
+        private void LoadItemsData()
+        {
+            try
+            {
+                dgItems.ItemsSource = itemsLogic.LoadItems();
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading items: " + ex.Message);
+            }
+        }
+
+        public wndItems()
+        {
+            InitializeComponent();
+            LoadItemsData();
+        }
+
+
         // Public flag to notify main window of changes
         public bool ItemsModified { get; private set; } = false;
 
