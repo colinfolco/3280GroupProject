@@ -63,35 +63,6 @@ namespace CS3280GroupProject
                 wndSearch.InitializeSearch();
                 wndSearch.ShowDialog();
                 this.Show();
-
-                //int selectedInvoiceID = clsInvoice.SelectedInvoiceID;
-                //if (selectedInvoiceID != 0)
-                //{
-                //    EditInvoiceButton.IsEnabled = true;
-                //    CreateInvoiceButton.IsEnabled = false;
-                //}
-                //(string InvoiceNum, string Cost, string InvoiceDateStr) = MainLogic.GetInvoiceByID(selectedInvoiceID);
-
-
-                //InvoiceDate.Text = InvoiceDateStr;
-                //InvoiceNumTexBox.Text = InvoiceNum;
-                //TotalCostlbl.Content = Cost;
-
-                //List<clsItem> items = MainLogic.GetItemsOnInvoice(selectedInvoiceID);
-                //DataGridView.Items.Clear();
-                //foreach (clsItem item in items)
-                //{
-                //    DataGridView.Items.Add(item);
-                //}
-                //double totalCost = MainLogic.CalculateTotalCost(items);
-
-
-                //// Set the total cost label content
-                ////TotalCostlbl.Content = $"$ {totalCost}";
-                //TotalCostlbl.Content = $"$ {Cost}";
-
-
-                //MainLogic.UpdateCost(InvoiceNum, totalCost);
             }
             catch (Exception ex)
             {
@@ -101,7 +72,7 @@ namespace CS3280GroupProject
         }
 
         //----------------------------------------------------------------------------------------------------------------------
-        // This method bellow that is commented is your original method you had...
+        // This method bellow that is commented, is your original method you had...
 
         /// opens the search window and extracts the invoice ID
         //private void btnSearchInvoice_Click(object sender, RoutedEventArgs e)
