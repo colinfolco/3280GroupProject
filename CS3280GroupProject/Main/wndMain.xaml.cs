@@ -1,5 +1,7 @@
-﻿using CS3280GroupProject.Items;
+﻿using CS3280GroupProject.Common;
+using CS3280GroupProject.Items;
 using CS3280GroupProject.Search;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,11 +19,20 @@ namespace CS3280GroupProject
     {
         private CS3280GroupProject.Main.clsMainLogic logic;
 
+        // Testing Search Part-----------------
+        wndSearch wndSearch;
+        // ------------------------------------
+
         public MainWindow()
         {
             InitializeComponent();
             logic = new CS3280GroupProject.Main.clsMainLogic();
             LoadItemsComboBox();
+
+            // Testing Search Part-----------------
+            wndSearch = new wndSearch();
+            // ------------------------------------
+
         }
 
         /// opens the items window and updates the combo box if it was modified
@@ -37,26 +48,83 @@ namespace CS3280GroupProject
             }
         }
 
-        /// opens the search window and extracts the invoice ID
+        // Testing Search Part -------------------------------------------------------------------------------------------------
+
+        // I commented out your method --> (private void btnSearchInvoice_Click) that is bellow this method for testing on the event of clicking search for your part
+        // you may make changes as required
+
         private void btnSearchInvoice_Click(object sender, RoutedEventArgs e)
         {
-            var searchWindow = new wndSearch();
-            if (searchWindow.ShowDialog() == true)
+            try
             {
-                string invoiceID = searchWindow.SelectedInvoiceID;
-                var invoice = logic.GetInvoice(invoiceID);
 
-                if (invoice != null)
-                {
-                    MessageBox.Show("Invoice ID: " + invoiceID);
-                    DisplayInvoiceDetails(invoice);
-                }
-                else
-                {
-                    MessageBox.Show("Invoice not found.");
-                }
+                this.Hide();
+                wndSearch = new wndSearch();
+                wndSearch.InitializeSearch();
+                wndSearch.ShowDialog();
+                this.Show();
+
+                //int selectedInvoiceID = clsInvoice.SelectedInvoiceID;
+                //if (selectedInvoiceID != 0)
+                //{
+                //    EditInvoiceButton.IsEnabled = true;
+                //    CreateInvoiceButton.IsEnabled = false;
+                //}
+                //(string InvoiceNum, string Cost, string InvoiceDateStr) = MainLogic.GetInvoiceByID(selectedInvoiceID);
+
+
+                //InvoiceDate.Text = InvoiceDateStr;
+                //InvoiceNumTexBox.Text = InvoiceNum;
+                //TotalCostlbl.Content = Cost;
+
+                //List<clsItem> items = MainLogic.GetItemsOnInvoice(selectedInvoiceID);
+                //DataGridView.Items.Clear();
+                //foreach (clsItem item in items)
+                //{
+                //    DataGridView.Items.Add(item);
+                //}
+                //double totalCost = MainLogic.CalculateTotalCost(items);
+
+
+                //// Set the total cost label content
+                ////TotalCostlbl.Content = $"$ {totalCost}";
+                //TotalCostlbl.Content = $"$ {Cost}";
+
+
+                //MainLogic.UpdateCost(InvoiceNum, totalCost);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name +
+                    "." + MethodInfo.GetCurrentMethod().Name + "->" + ex.Message);
             }
         }
+
+        //----------------------------------------------------------------------------------------------------------------------
+        // This method bellow that is commented is your original method you had...
+
+        /// opens the search window and extracts the invoice ID
+        //private void btnSearchInvoice_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var searchWindow = new wndSearch();
+        //    if (searchWindow.ShowDialog() == true)
+        //    {
+        //        string invoiceID = searchWindow.SelectedInvoiceID;
+        //        var invoice = logic.GetInvoice(invoiceID);
+
+        //        if (invoice != null)
+        //        {
+        //            MessageBox.Show("Invoice ID: " + invoiceID);
+        //            DisplayInvoiceDetails(invoice);
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show("Invoice not found.");
+        //        }
+        //    }
+        //}
+
+        //--------------------------------------------------------------------------------------------------------------------------
 
         /// loads items into the combo box
         private void LoadItemsComboBox()

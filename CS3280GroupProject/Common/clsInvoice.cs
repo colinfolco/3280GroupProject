@@ -12,5 +12,18 @@ namespace CS3280GroupProject.Common
         //Invoice date
         //Total cost
         //List<clsItem> Items
+
+        public string InvoiceNumber { get; set; }
+
+        public string InvoiceDate { get; set; }
+
+        public string TotalCost { get; set; }
+
+        public static int SelectedInvoiceID { get; set; }
+
+
+
+
+
     }
 }
