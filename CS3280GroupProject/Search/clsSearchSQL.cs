@@ -17,15 +17,20 @@ namespace CS3280GroupProject.Search
         clsSearchLogic searchLogic;
         clsInvoice invoice;
         clsDataAccess dataAccess;
-        
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public clsSearchSQL()
         {
-            
             invoice = new clsInvoice();
             dataAccess = new clsDataAccess();
         }
 
+        /// <summary>
+        /// this gets the invoices from the database
+        /// </summary>
+        /// <returns></returns>
         public string Invoices()
         {
             return "SELECT * FROM Invoices";
@@ -52,6 +57,7 @@ namespace CS3280GroupProject.Search
                     MethodInfo.GetCurrentMethod().Name + " --> " + ex.Message);
             }
         }
+
         /// <summary>
         /// gets SQL Date
         /// </summary>
@@ -72,6 +78,7 @@ namespace CS3280GroupProject.Search
                     MethodInfo.GetCurrentMethod().Name + " --> " + ex.Message);
             }
         }
+
         /// <summary>
         /// gets SQL total cost
         /// </summary>
@@ -92,7 +99,6 @@ namespace CS3280GroupProject.Search
                     MethodInfo.GetCurrentMethod().Name + " --> " + ex.Message);
             }
         }
-
 
     }
 }

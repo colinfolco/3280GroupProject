@@ -21,9 +21,5 @@ namespace CS3280GroupProject.Common
 
         public static int SelectedInvoiceID { get; set; }
 
-
-
-
-
     }
 }

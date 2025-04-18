@@ -17,7 +17,7 @@ namespace CS3280GroupProject.Common
         private string sConnectionString;
 
         /// <summary>
-        /// 
+        /// constructor
         /// </summary>
         /// <exception cref="Exception"></exception>
         public clsDataAccess()
@@ -35,8 +35,7 @@ namespace CS3280GroupProject.Common
         }
 
         /// <summary>
-        /// This executes the SQL staement returning the SQL values as well as the ammpont of items that are in the table
-        /// This is used to populate ItemComboBox along with other enteties that display information
+        /// This executes the SQL staement returning the SQL values as well as the items that are in the table
         /// </summary>
         /// <param name="sSQL"></param>
         /// <param name="iRetVal"></param>
@@ -76,9 +75,6 @@ namespace CS3280GroupProject.Common
                     MethodInfo.GetCurrentMethod().Name + " --> " + ex.Message);
             }
         }
-
-
-
 
     }
 }
