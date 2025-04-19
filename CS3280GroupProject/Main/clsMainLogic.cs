@@ -44,10 +44,11 @@ namespace CS3280GroupProject.Main
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("error: " + ex.Message);
                 return null;
             }
         }
+
 
         /// saves or updates an invoice
         public void SaveNewInvoice(clsInvoice invoice)
@@ -56,24 +57,37 @@ namespace CS3280GroupProject.Main
             {
                 if (invoice.InvoiceNumber == 0)
                 {
+                    // insert a new invoice
                     var sql = new clsMainSQL();
                     string sqlQuery = clsMainSQL.InsertNewInvoice(invoice.InvoiceDate, invoice.TotalCost);
                     ExecuteSQLNonQuery(sqlQuery);
-                    invoice.InvoiceNumber = int.Parse(GetMaxInvoiceNumber());
-                    MessageBox.Show("Invoice created successfully.");
+
+                    // update invoice number after insert
+                    string maxInvoiceNumStr = GetMaxInvoiceNumber();
+                    if (int.TryParse(maxInvoiceNumStr, out int maxInvoiceNum))
+                    {
+                        invoice.InvoiceNumber = maxInvoiceNum;
+                    }
+                    else
+                    {
+                        throw new Exception("unable to retrieve new invoice number");
+                    }
                 }
                 else
                 {
+                    // update existing invoice
                     string sqlQuery = clsMainSQL.UpdateInvoice(invoice.InvoiceNumber.ToString(), invoice.TotalCost);
                     ExecuteSQLNonQuery(sqlQuery);
-                    MessageBox.Show("Invoice updated successfully.");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving invoice: " + ex.Message);
+                MessageBox.Show("error saving invoice: " + ex.Message);
+                throw;
             }
         }
+
+
 
 
         /// retrieves an invoice by invoice number.
@@ -88,7 +102,7 @@ namespace CS3280GroupProject.Main
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("error: " + ex.Message);
                 return null;
             }
         }
@@ -122,12 +136,12 @@ namespace CS3280GroupProject.Main
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading invoice: " + ex.Message);
+                MessageBox.Show("error loading invoice: " + ex.Message);
                 return null;
             }
         }
 
-
+        
         private void ExecuteSQLNonQuery(string sqlQuery)
         {
             var db = new CS3280GroupProject.Common.clsDataAccess();
@@ -136,7 +150,7 @@ namespace CS3280GroupProject.Main
         }
 
 
-        /// placeholder to execute SQL and map results to a list.
+        /// this was a placeholder but deleting it breaks things so i guess its here to stay.
         private List<Item> ExecuteSQLAndMapToItemList(string sqlQuery)
         {
             List<Item> items = new List<Item>();
@@ -155,11 +169,11 @@ namespace CS3280GroupProject.Main
 
                 SaveLineItems(newInvoice.InvoiceNumber);
 
-                MessageBox.Show("Invoice updated successfully.");
+                MessageBox.Show("invoice updated successfully");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error updating invoice: " + ex.Message);
+                MessageBox.Show("error updating invoice: " + ex.Message);
             }
         }
 
@@ -183,7 +197,7 @@ namespace CS3280GroupProject.Main
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error retrieving max invoice number: " + ex.Message);
+                MessageBox.Show("error retrieving highest invoice number: " + ex.Message);
                 return "TBD";
             }
         }
@@ -216,7 +230,7 @@ namespace CS3280GroupProject.Main
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving line items: " + ex.Message);
+                MessageBox.Show("error saving line items: " + ex.Message);
             }
         }
 
@@ -239,12 +253,12 @@ namespace CS3280GroupProject.Main
                 }
                 else
                 {
-                    throw new Exception("Item code not found for item name: " + itemName);
+                    throw new Exception("item code not found for item " + itemName);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error looking up item code: " + ex.Message);
+                MessageBox.Show("error looking up item code: " + ex.Message);
                 return "UNKNOWN";
             }
         }
@@ -263,14 +277,97 @@ namespace CS3280GroupProject.Main
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error deleting line items: " + ex.Message);
+                MessageBox.Show("error deleting items: " + ex.Message);
             }
         }
 
+        /// uh. gets items for the combo box
+        public List<Item> GetItemsForComboBox()
+        {
+            try
+            {
+                var itemsLogic = new CS3280GroupProject.Items.clsItemsLogic();
+                return itemsLogic.LoadItems();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("error loading items: " + ex.Message);
+                return new List<Item>();
+            }
+        }
 
+        /// get the items on an invoice
+        public List<Item> GetItemsOnInvoice(int invoiceNum)
+        {
+            List<Item> invoiceItems = new List<Item>();
 
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                int iRetVal = 0;
+                string sqlQuery = $@"
+            SELECT ItemDesc.ItemDesc, ItemDesc.Cost
+            FROM LineItems
+            INNER JOIN ItemDesc ON LineItems.ItemCode = ItemDesc.ItemCode
+            WHERE LineItems.InvoiceNum = {invoiceNum}";
 
+                var ds = db.ExecuteSQLStatement(sqlQuery, ref iRetVal);
 
+                for (int i = 0; i < iRetVal; i++)
+                {
+                    var item = new Item
+                    {
+                        ItemName = ds.Tables[0].Rows[i]["ItemDesc"].ToString(),
+                        Price = decimal.Parse(ds.Tables[0].Rows[i]["Cost"].ToString())
+                    };
+                    invoiceItems.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("error loading items: " + ex.Message);
+            }
+
+            return invoiceItems;
+        }
+
+        /// updates the total cost for a specific invoice
+        public void UpdateInvoiceTotal(int invoiceNumber, double newTotalCost)
+        {
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                int iRetVal = 0;
+                string sqlQuery = $"UPDATE Invoices SET TotalCost = {newTotalCost} WHERE InvoiceNum = {invoiceNumber}";
+                db.ExecuteNonQuery(sqlQuery, ref iRetVal);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("error updating total: " + ex.Message);
+            }
+        }
+
+        /// Deletes an invoice and its related line items
+        public void DeleteInvoice(int invoiceNumber)
+        {
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                int iRetVal = 0;
+
+                // delete line items first
+                string deleteLineItemsSQL = $"DELETE FROM LineItems WHERE InvoiceNum = {invoiceNumber}";
+                db.ExecuteNonQuery(deleteLineItemsSQL, ref iRetVal);
+
+                // then delete invoice
+                string deleteInvoiceSQL = $"DELETE FROM Invoices WHERE InvoiceNum = {invoiceNumber}";
+                db.ExecuteNonQuery(deleteInvoiceSQL, ref iRetVal);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("error deleting invoice: " + ex.Message);
+            }
+        }
 
 
 

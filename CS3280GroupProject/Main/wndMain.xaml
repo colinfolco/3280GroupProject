@@ -7,10 +7,44 @@
         mc:Ignorable="d"
         Title="Invoice Management" Height="450" Width="800">
 
-    <!-- main grid -->
-    <Grid Margin="10">
+	<Window.Resources>
+		<!-- customization for buttons, textboxes, and the datagrid -->
+		
+		<Style TargetType="Button">
+			<Setter Property="Background" Value="#FFD1E8E2"/>
+			<Setter Property="Foreground" Value="#FF4B4B4B"/>
+			<Setter Property="BorderBrush" Value="#FFB5C6CA"/>
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="Margin" Value="5"/>
+			<Setter Property="Padding" Value="5"/>
+		</Style>
 
-        <!-- top menu for search and edit items -->
+		<Style TargetType="TextBox">
+			<Setter Property="Background" Value="#FFFCE1E4"/>
+			<Setter Property="Foreground" Value="#FF4B4B4B"/>
+			<Setter Property="BorderBrush" Value="#FFF4A7B9"/>
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="Margin" Value="5"/>
+		</Style>
+
+		<Style TargetType="DataGrid">
+			<Setter Property="Background" Value="#FFE3F2FD"/>
+			<Setter Property="Foreground" Value="#FF4B4B4B"/>
+			<Setter Property="BorderBrush" Value="#FFBBDEFB"/>
+			<Setter Property="GridLinesVisibility" Value="All"/>
+			<Setter Property="HorizontalGridLinesBrush" Value="#FFBBDEFB"/>
+			<Setter Property="VerticalGridLinesBrush" Value="#FFBBDEFB"/>
+			<Setter Property="FontSize" Value="14"/>
+		</Style>
+		
+		<!-- to do: change the combo box styling-->
+
+	</Window.Resources>
+
+
+	<!-- main grid -->
+    <Grid Margin="10" Background="#FFFFFBF0">
+		  <!-- top menu for search and edit items -->
         <Menu VerticalAlignment="Top" HorizontalAlignment="Left">
             <MenuItem Header="Search" Click="btnSearchInvoice_Click"/>
             <MenuItem Header="Edit Items" Click="btnEditItems_Click"/>
@@ -37,8 +71,8 @@
         <GroupBox Header="Items" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200,70,0,0" Width="300">
             <StackPanel Margin="5">
                 <TextBlock Text="Items:" Margin="0,5,0,0"/>
-                <ComboBox Name="cmbItems" Width="200" Margin="0,5,0,0" SelectionChanged="cmbItems_SelectionChanged"/>
-                <TextBlock Text="Cost:" Margin="0,5,0,0"/>
+				<ComboBox Name="cmbItems" Width="200" Margin="0,5,0,0"/>
+				<TextBlock Text="Cost:" Margin="0,5,0,0"/>
                 <TextBox Name="txtItemCost" Width="200" Margin="0,5,0,0" IsReadOnly="True"/>
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                     <Button Name="btnAddItem" Content="Add Item" Click="btnAddItem_Click" Width="100" Margin="5"/>

@@ -32,19 +32,44 @@ namespace CS3280GroupProject.Items
         }
 
 
+
         // Public flag to notify main window of changes
         public bool ItemsModified { get; private set; } = false;
 
+        /// I commented out this code and wrote some beneath it
+        /*
+
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            /* 
              * When saving changes:
              * 1. Business logic validates data
              * 2. SQL class generates update/insert statements
              * 3. ItemsModified flag set to true to notify main window
-             */
             ItemsModified = true;
             this.Close();
+        }
+        */
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var modifiedItems = (List<Item>)dgItems.ItemsSource;
+                if (itemsLogic.SaveChanges(modifiedItems))
+                {
+                    ItemsModified = true;
+                    MessageBox.Show("Items saved successfully.");
+                }
+                else
+                {
+                    MessageBox.Show("Error saving items.");
+                }
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving items: " + ex.Message);
+            }
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)

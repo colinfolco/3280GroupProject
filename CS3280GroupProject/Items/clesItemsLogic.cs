@@ -45,12 +45,33 @@ namespace CS3280GroupProject.Items
 
             return items;
         }
-
+        /* i also edited this out to write something
         public bool SaveChanges(List<Item> modifiedItems)
         {
             // Execute _sql.UpdateItem() for each modified item (not yet implemented)
             return true;
         }
+        */
+
+        public bool SaveChanges(List<Item> modifiedItems)
+        {
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                foreach (var item in modifiedItems)
+                {
+                    string sql = $"UPDATE ItemDesc SET ItemDesc = '{item.ItemName.Replace("'", "''")}', Cost = {item.Price} WHERE ItemCode = '{item.ItemID}'";
+                    int iRetVal = 0;
+                    db.ExecuteNonQuery(sql, ref iRetVal);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
 
     public class Item

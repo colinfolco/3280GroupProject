@@ -43,8 +43,14 @@ namespace CS3280GroupProject
 
             if (itemsWindow.ItemsModified)
             {
-                MessageBox.Show("Items have been updated. refreshing the list.");
+                MessageBox.Show("items have been updated. refreshing the list.");
                 LoadItemsComboBox();
+                if (!string.IsNullOrWhiteSpace(txtInvoiceNumber.Text))
+                {
+                    LoadInvoiceItems(int.Parse(txtInvoiceNumber.Text));
+                }
+
+
             }
         }
 
@@ -53,7 +59,7 @@ namespace CS3280GroupProject
         // I commented out your method --> (private void btnSearchInvoice_Click) that is bellow this method for testing on the event of clicking search for your part
         // you may make changes as required
 
-        // all good. i had to edit it a lot so i hope everything still works everywhere? i haven't noticed an issue with the search window.
+        // all good. i had to edit it a lot so i hope everything still works everywhere? i haven't noticed any issues.
         private void btnSearchInvoice_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -78,7 +84,7 @@ namespace CS3280GroupProject
                         }
                         else
                         {
-                            MessageBox.Show("Invoice not found.");
+                            MessageBox.Show("invoice not found.");
                         }
                     }
                 }
@@ -123,8 +129,7 @@ namespace CS3280GroupProject
         {
             try
             {
-                var itemsLogic = new CS3280GroupProject.Items.clsItemsLogic();
-                var items = itemsLogic.LoadItems();
+                var items = logic.GetItemsForComboBox();
                 cmbItems.Items.Clear();
 
                 if (items != null && items.Count > 0)
@@ -143,6 +148,7 @@ namespace CS3280GroupProject
         }
 
 
+
         /// when the selected item changes update the cost textbox
         private void cmbItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -156,7 +162,7 @@ namespace CS3280GroupProject
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading item cost: " + ex.Message);
+                MessageBox.Show("error loading cost: " + ex.Message);
             }
         }
 
@@ -189,15 +195,9 @@ namespace CS3280GroupProject
                     return;
                 }
 
-                if (!double.TryParse(txtTotalCost.Text, out double totalCost))
+                if (!double.TryParse(txtTotalCost.Text, out double totalCost) || totalCost < 0)
                 {
                     MessageBox.Show("please enter a valid number for total cost.");
-                    return;
-                }
-
-                if (totalCost < 0)
-                {
-                    MessageBox.Show("total cost cannot be negative.");
                     return;
                 }
 
@@ -207,38 +207,37 @@ namespace CS3280GroupProject
                     return;
                 }
 
-                int invoiceNumber;
-                bool isNewInvoice = string.IsNullOrWhiteSpace(txtInvoiceNumber.Text);
+                bool isNewInvoice = string.IsNullOrWhiteSpace(txtInvoiceNumber.Text) || txtInvoiceNumber.Text == "TBD";
+                int invoiceNumber = 0;
 
-                if (isNewInvoice)
-                {
-                    invoiceNumber = 1;
-                    string maxInvoiceNumStr = logic.GetMaxInvoiceNumber();
-                    if (int.TryParse(maxInvoiceNumStr, out int maxInvoiceNum))
-                    {
-                        invoiceNumber = maxInvoiceNum + 1;
-                    }
-                }
-                else
+                if (!isNewInvoice)
                 {
                     invoiceNumber = int.Parse(txtInvoiceNumber.Text);
                 }
 
-                var invoice = new CS3280GroupProject.Main.clsMainLogic.clsInvoice
+                var newInvoice = new CS3280GroupProject.Main.clsMainLogic.clsInvoice
                 {
                     InvoiceNumber = invoiceNumber,
                     InvoiceDate = invoiceDate,
                     TotalCost = totalCost
                 };
 
-                logic.SaveNewInvoice(invoice);
+                // save the invoice first
+                logic.SaveNewInvoice(newInvoice);
 
-                logic.DeleteLineItems(invoiceNumber);
-                logic.SaveLineItems(invoiceNumber);
+                // after saving, make sure we have a valid invoice number
+                if (newInvoice.InvoiceNumber == 0)
+                {
+                    MessageBox.Show("error: invoice number could not be retrieved.");
+                    return;
+                }
 
-                MessageBox.Show($"invoice {invoiceNumber} saved successfully.");
+                // then save the line items
+                logic.SaveLineItems(newInvoice.InvoiceNumber);
 
-                txtInvoiceNumber.Text = invoiceNumber.ToString();
+                MessageBox.Show($"invoice {newInvoice.InvoiceNumber} saved successfully.");
+
+                txtInvoiceNumber.Text = newInvoice.InvoiceNumber.ToString();
                 LockInvoiceFields();
                 btnCreateInvoice.IsEnabled = false;
             }
@@ -247,8 +246,6 @@ namespace CS3280GroupProject
                 MessageBox.Show("error saving invoice: " + ex.Message);
             }
         }
-
-
 
 
         /// unlocks invoice fields so user can edit them
@@ -281,7 +278,7 @@ namespace CS3280GroupProject
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error unlocking invoice fields: " + ex.Message);
+                MessageBox.Show("error unlocking invoice fields: " + ex.Message);
             }
         }
 
@@ -299,7 +296,6 @@ namespace CS3280GroupProject
             btnRemoveItem.IsEnabled = false;
             dgInvoiceItems.IsEnabled = false;
         }
-
 
         /// adds the selected item to the invoice when clicked
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
@@ -338,17 +334,17 @@ namespace CS3280GroupProject
             {
                 if (dgInvoiceItems.SelectedItem == null)
                 {
-                    MessageBox.Show("Select an item to remove");
+                    MessageBox.Show("select an item to remove");
                     return;
                 }
 
                 dgInvoiceItems.Items.Remove(dgInvoiceItems.SelectedItem);
                 UpdateTotalCost();
-                MessageBox.Show("Item removed");
+                MessageBox.Show("item removed");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("error: " + ex.Message);
             }
         }
 
@@ -379,16 +375,14 @@ namespace CS3280GroupProject
                 int invoiceNumber;
                 if (int.TryParse(txtInvoiceNumber.Text, out invoiceNumber) && invoiceNumber != 0)
                 {
-                    var db = new CS3280GroupProject.Common.clsDataAccess();
-                    string sqlQuery = $"UPDATE Invoices SET TotalCost = {total} WHERE InvoiceNum = {invoiceNumber}";
-                    int iRetVal = 0;
-                    db.ExecuteNonQuery(sqlQuery, ref iRetVal);
+                    logic.UpdateInvoiceTotal(invoiceNumber, total);
+
 
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error updating total cost in database: " + ex.Message);
+                MessageBox.Show("error updating total cost in database: " + ex.Message);
             }
         }
 
@@ -404,52 +398,42 @@ namespace CS3280GroupProject
                     int invoiceNumber = int.Parse(txtInvoiceNumber.Text);
                     double totalCost = double.Parse(txtTotalCost.Text);
 
-                    var sqlQuery = CS3280GroupProject.Main.clsMainSQL.UpdateInvoice(invoiceNumber.ToString(), totalCost);
-
-                    var db = new CS3280GroupProject.Common.clsDataAccess();
-                    int iRetVal = 0;
-                    db.ExecuteNonQuery(sqlQuery, ref iRetVal);
+                    logic.UpdateInvoiceTotal(invoiceNumber, totalCost);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error updating total cost in database: " + ex.Message);
+                MessageBox.Show("error updating total cost: " + ex.Message);
             }
         }
+
+
 
         /// loads all items for a specific invoice into the datagrid
         private void LoadInvoiceItems(int invoiceNum)
         {
             try
             {
-                var db = new CS3280GroupProject.Common.clsDataAccess();
-                int iRetVal = 0;
-
-                string sqlQuery = $@"
-            SELECT ItemDesc.ItemDesc, ItemDesc.Cost
-            FROM LineItems
-            INNER JOIN ItemDesc ON LineItems.ItemCode = ItemDesc.ItemCode
-            WHERE LineItems.InvoiceNum = {invoiceNum}";
-
-                var ds = db.ExecuteSQLStatement(sqlQuery, ref iRetVal);
+                var invoiceItems = logic.GetItemsOnInvoice(invoiceNum);
 
                 dgInvoiceItems.Items.Clear();
 
-                for (int i = 0; i < iRetVal; i++)
+                foreach (var item in invoiceItems)
                 {
-                    var item = new
+                    dgInvoiceItems.Items.Add(new
                     {
-                        ItemName = ds.Tables[0].Rows[i]["ItemDesc"].ToString(),
-                        Cost = decimal.Parse(ds.Tables[0].Rows[i]["Cost"].ToString())
-                    };
-                    dgInvoiceItems.Items.Add(item);
+                        ItemName = item.ItemName,
+                        Cost = item.Price
+                    });
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading invoice items: " + ex.Message);
+                MessageBox.Show("error loading invoice items: " + ex.Message);
             }
         }
+
+
         /// clears invoice fields
         private void ClearInvoiceFields()
         {
@@ -467,27 +451,19 @@ namespace CS3280GroupProject
             {
                 if (string.IsNullOrEmpty(txtInvoiceNumber.Text) || txtInvoiceNumber.Text == "TBD")
                 {
-                    MessageBox.Show("No invoice selected to delete.");
+                    MessageBox.Show("no invoice selected to delete.");
                     return;
                 }
 
-                var result = MessageBox.Show("Are you sure you want to delete this invoice?", "Confirm Delete", MessageBoxButton.YesNo);
+                var result = MessageBox.Show("are you sure you want to delete this invoice?", "Confirm Delete", MessageBoxButton.YesNo);
 
                 if (result == MessageBoxResult.Yes)
                 {
                     int invoiceNumber = int.Parse(txtInvoiceNumber.Text);
 
-                    // delete from LineItems and Invoices
-                    var db = new CS3280GroupProject.Common.clsDataAccess();
-                    int iRetVal = 0;
+                    logic.DeleteInvoice(invoiceNumber);
 
-                    string deleteLineItemsSQL = $"DELETE FROM LineItems WHERE InvoiceNum = {invoiceNumber}";
-                    db.ExecuteNonQuery(deleteLineItemsSQL, ref iRetVal);
-
-                    string deleteInvoiceSQL = $"DELETE FROM Invoices WHERE InvoiceNum = {invoiceNumber}";
-                    db.ExecuteNonQuery(deleteInvoiceSQL, ref iRetVal);
-
-                    MessageBox.Show("Invoice deleted successfully.");
+                    MessageBox.Show("invoice deleted");
 
                     // clear fields after deleting
                     ClearInvoiceFields();
@@ -495,12 +471,9 @@ namespace CS3280GroupProject
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error deleting invoice: " + ex.Message);
+                MessageBox.Show("error deleting invoice: " + ex.Message);
             }
         }
-
-
-
 
 
     }
