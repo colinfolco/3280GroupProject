@@ -21,8 +21,9 @@ namespace CS3280GroupProject.Main
         /// retrieves invoice data by invoice number.
         public static string GetInvoiceData(string invoiceNumber)
         {
-            return $"SELECT * FROM Invoices WHERE InvoiceNum = '{invoiceNumber}'";
+            return $"SELECT * FROM Invoices WHERE InvoiceNum = {invoiceNumber}";
         }
+
 
         /// retrieves all invoices.
         public static string GetAllInvoices()
@@ -31,17 +32,19 @@ namespace CS3280GroupProject.Main
         }
 
         /// inserts a new invoice.
-        public static string InsertNewInvoice(string invoiceNumber, DateTime invoiceDate, double totalCost)
+        public static string InsertNewInvoice(DateTime invoiceDate, double totalCost)
         {
-            return $"INSERT INTO Invoices (InvoiceNum, InvoiceDate, TotalCost) " +
-                   $"VALUES ('{invoiceNumber}', '{invoiceDate:yyyy-MM-dd}', {totalCost})";
+            return $"INSERT INTO Invoices (InvoiceDate, TotalCost) " +
+                   $"VALUES ('{invoiceDate:yyyy-MM-dd}', {totalCost})";
         }
+
 
         /// updates the total cost of an invoice.
         public static string UpdateInvoice(string invoiceNumber, double newTotal)
         {
-            return $"UPDATE Invoices SET TotalCost = {newTotal} WHERE InvoiceNum = '{invoiceNumber}'";
+            return $"UPDATE Invoices SET TotalCost = {newTotal} WHERE InvoiceNum = {invoiceNumber}";
         }
+
 
         /// deletes an invoice by invoice number.
         public static string DeleteInvoice(string invoiceNumber)

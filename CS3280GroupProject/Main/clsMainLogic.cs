@@ -49,21 +49,32 @@ namespace CS3280GroupProject.Main
             }
         }
 
-        /// saves a new invoice to the database.
+        /// saves or updates an invoice
         public void SaveNewInvoice(clsInvoice invoice)
         {
             try
             {
-                var sql = new clsMainSQL();
-                string sqlQuery = clsMainSQL.InsertNewInvoice(invoice.InvoiceNumber.ToString(), invoice.InvoiceDate, invoice.TotalCost);
-                ExecuteSQLNonQuery(sqlQuery);
-                MessageBox.Show("Invoice saved.");
+                if (invoice.InvoiceNumber == 0)
+                {
+                    var sql = new clsMainSQL();
+                    string sqlQuery = clsMainSQL.InsertNewInvoice(invoice.InvoiceDate, invoice.TotalCost);
+                    ExecuteSQLNonQuery(sqlQuery);
+                    invoice.InvoiceNumber = int.Parse(GetMaxInvoiceNumber());
+                    MessageBox.Show("Invoice created successfully.");
+                }
+                else
+                {
+                    string sqlQuery = clsMainSQL.UpdateInvoice(invoice.InvoiceNumber.ToString(), invoice.TotalCost);
+                    ExecuteSQLNonQuery(sqlQuery);
+                    MessageBox.Show("Invoice updated successfully.");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("Error saving invoice: " + ex.Message);
             }
         }
+
 
         /// retrieves an invoice by invoice number.
         public clsInvoice GetInvoice(string invoiceNumber)
@@ -82,17 +93,48 @@ namespace CS3280GroupProject.Main
             }
         }
 
-        /// placeholder to execute SQL and map results to a clsInvoice.
         private clsInvoice ExecuteSQLAndMapToInvoice(string sqlQuery)
         {
-            clsInvoice invoice = new clsInvoice();
-            return invoice;
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                int iRetVal = 0;
+                var ds = db.ExecuteSQLStatement(sqlQuery, ref iRetVal);
+
+                if (iRetVal > 0)
+                {
+                    var row = ds.Tables[0].Rows[0];
+
+                    var invoice = new clsInvoice
+                    {
+                        InvoiceNumber = int.Parse(row["InvoiceNum"].ToString()),
+                        InvoiceDate = DateTime.Parse(row["InvoiceDate"].ToString()),
+                        TotalCost = double.Parse(row["TotalCost"].ToString()),
+                        Items = new List<Items.Item>() // you can load items separately later if needed
+                    };
+
+                    return invoice;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading invoice: " + ex.Message);
+                return null;
+            }
         }
 
-        /// placeholder to execute non query SQL commands
+
         private void ExecuteSQLNonQuery(string sqlQuery)
         {
+            var db = new CS3280GroupProject.Common.clsDataAccess();
+            int iRetVal = 0;
+            db.ExecuteNonQuery(sqlQuery, ref iRetVal);
         }
+
 
         /// placeholder to execute SQL and map results to a list.
         private List<Item> ExecuteSQLAndMapToItemList(string sqlQuery)
@@ -151,6 +193,8 @@ namespace CS3280GroupProject.Main
         {
             try
             {
+                DeleteLineItems(invoiceNumber);
+
                 int lineItemNumber = 1;
 
                 foreach (var item in App.Current.Windows.OfType<MainWindow>().First().dgInvoiceItems.Items)
@@ -175,6 +219,7 @@ namespace CS3280GroupProject.Main
                 MessageBox.Show("Error saving line items: " + ex.Message);
             }
         }
+
 
         /// looks up the item code based on item name
         private string GetItemCodeFromName(string itemName)
@@ -205,7 +250,7 @@ namespace CS3280GroupProject.Main
         }
 
         /// deletes all line items for an invoice
-        private void DeleteLineItems(int invoiceNumber)
+        public void DeleteLineItems(int invoiceNumber)
         {
             try
             {

@@ -139,15 +139,22 @@ namespace CS3280GroupProject.Search
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnSelectInvoice_Click(object sender, RoutedEventArgs e) // I had to rewrite some of this. It had 0 references so I hope it doesn't break anything?
+        private void btnSelectInvoice_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                clsInvoice selectedInvoice = (clsInvoice)dataGrid.SelectedItem;
+                if (dataGrid.SelectedItem is clsInvoice selectedInvoice)
+                {
+                    SelectedInvoiceID = selectedInvoice.InvoiceNumber.ToString();
 
-                SelectedInvoiceID = selectedInvoice.InvoiceNumber.ToString(); // I changed how things are converted here
-                this.DialogResult = true;
-                this.Close();
+                    MessageBox.Show($"Selected InvoiceID: {SelectedInvoiceID}");
+
+                    this.DialogResult = true;
+                }
+                else
+                {
+                    MessageBox.Show("Please select an invoice first.");
+                }
             }
             catch (Exception ex)
             {
@@ -155,6 +162,8 @@ namespace CS3280GroupProject.Search
                             MethodInfo.GetCurrentMethod().Name, ex.Message);
             }
         }
+
+
 
 
         /// <summary>

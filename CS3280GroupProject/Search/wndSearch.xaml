@@ -8,8 +8,8 @@
         Title="wndSearch" Height="450" Width="800">
     <Grid>
         <Button x:Name="btnClearFilter" Content="Clear Filter" HorizontalAlignment="Left" Margin="160,359,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="btnClearFilter_Click"/>
-        <Button x:Name="btnSelectInvoice" Content="Select Invoice" HorizontalAlignment="Left" Margin="514,359,0,0" VerticalAlignment="Top" Width="100" Height="30"/>
-        <ComboBox x:Name="cbInvoiceNumber" HorizontalAlignment="Left" Margin="90,55,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
+		<Button x:Name="btnSelectInvoice" Content="Select Invoice" HorizontalAlignment="Left" Margin="514,359,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="btnSelectInvoice_Click"/>
+		<ComboBox x:Name="cbInvoiceNumber" HorizontalAlignment="Left" Margin="90,55,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
         <ComboBox x:Name="cbInvoiceDate" HorizontalAlignment="Left" Margin="327,55,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
         <ComboBox x:Name="cbTotalCosts" HorizontalAlignment="Left" Margin="563,55,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
         <DataGrid x:Name="dataGrid" AutoGenerateColumns="True" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="90,114,117,114" SelectionChanged="dataGrid_SelectionChanged"/>
