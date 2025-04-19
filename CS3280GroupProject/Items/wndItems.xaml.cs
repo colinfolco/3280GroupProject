@@ -1,87 +1,165 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace CS3280GroupProject.Items
 {
+    /// <summary>
+    /// Interaction logic for item management window
+    /// </summary>
     public partial class wndItems : Window
     {
-        private clsItemsLogic itemsLogic = new clsItemsLogic();
+        private readonly clsItemsLogic _itemsLogic = new clsItemsLogic();
+        public bool ItemsModified { get; private set; }
 
-
-        private void LoadItemsData()
-        {
-            try
-            {
-                dgItems.ItemsSource = itemsLogic.LoadItems();
-            }
-
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading items: " + ex.Message);
-            }
-        }
-
+        /// <summary>
+        /// Initializes item management window
+        /// </summary>
         public wndItems()
         {
             InitializeComponent();
             LoadItemsData();
         }
 
-
-
-        // Public flag to notify main window of changes
-        public bool ItemsModified { get; private set; } = false;
-
-        /// I commented out this code and wrote some beneath it
-        /*
-
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Loads items into the DataGrid
+        /// </summary>
+        private void LoadItemsData()
         {
-             * When saving changes:
-             * 1. Business logic validates data
-             * 2. SQL class generates update/insert statements
-             * 3. ItemsModified flag set to true to notify main window
-            ItemsModified = true;
-            this.Close();
+            try
+            {
+                dgItems.ItemsSource = _itemsLogic.LoadItems();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading items: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
-        */
 
+        /// <summary>
+        /// Handles item deletion requests
+        /// </summary>
+        private void btnDeleteItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var button = sender as Button;
+                var item = button?.DataContext as Item;
+
+                if (item != null && dgItems.ItemsSource is List<Item> items)
+                {
+                    items.Remove(item);
+                    dgItems.Items.Refresh();
+                    ItemsModified = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting item: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handles new item creation
+        /// </summary>
+        private void btnAdd_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!ValidateInputs()) return;
+
+                var newItem = new Item
+                {
+                    ItemID = txtItemCode.Text.Trim(),
+                    ItemName = txtItemName.Text.Trim(),
+                    Price = decimal.Parse(txtPrice.Text)
+                };
+
+                if (dgItems.ItemsSource is List<Item> items)
+                {
+                    items.Add(newItem);
+                    dgItems.Items.Refresh();
+                    ClearInputs();
+                    ItemsModified = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding item: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Validates user input for new items
+        /// </summary>
+        private bool ValidateInputs()
+        {
+            if (string.IsNullOrWhiteSpace(txtItemCode.Text))
+            {
+                MessageBox.Show("Item Code is required", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtItemName.Text))
+            {
+                MessageBox.Show("Item Name is required", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!decimal.TryParse(txtPrice.Text, out _))
+            {
+                MessageBox.Show("Invalid price format", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Clears input fields after successful addition
+        /// </summary>
+        private void ClearInputs()
+        {
+            txtItemCode.Clear();
+            txtItemName.Clear();
+            txtPrice.Clear();
+        }
+
+        /// <summary>
+        /// Commits changes to the database
+        /// </summary>
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var modifiedItems = (List<Item>)dgItems.ItemsSource;
-                if (itemsLogic.SaveChanges(modifiedItems))
+                if (dgItems.ItemsSource is List<Item> modifiedItems)
                 {
-                    ItemsModified = true;
-                    MessageBox.Show("Items saved successfully.");
+                    if (_itemsLogic.SaveChanges(modifiedItems))
+                    {
+                        ItemsModified = true;
+                        MessageBox.Show("Changes saved successfully!", "Success",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                        Close();
+                    }
                 }
-                else
-                {
-                    MessageBox.Show("Error saving items.");
-                }
-                this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving items: " + ex.Message);
+                MessageBox.Show($"Save failed: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            // Close without saving
-            this.Close();
-        }
-        private void btnAdd_Click(object sender, RoutedEventArgs e)
-        {
-            ItemsModified = true;
-            // Placeholder method for btnAdd_Click
-            // Implementation will be added later
-        }
+        /// <summary>
+        /// Closes window without saving
+        /// </summary>
+        private void btnCancel_Click(object sender, RoutedEventArgs e) => Close();
     }
 }
