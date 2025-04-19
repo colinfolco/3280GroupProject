@@ -134,25 +134,29 @@ namespace CS3280GroupProject
         {
             try
             {
-                int invoiceNumber = int.Parse(txtInvoiceNumber.Text);
+                txtInvoiceNumber.Text = "TBD";
+
                 DateTime invoiceDate = DateTime.Parse(txtInvoiceDate.Text);
                 double totalCost = double.Parse(txtTotalCost.Text);
 
                 var newInvoice = new CS3280GroupProject.Main.clsMainLogic.clsInvoice
                 {
-                    InvoiceNumber = invoiceNumber,
+                    InvoiceNumber = 0,
                     InvoiceDate = invoiceDate,
                     TotalCost = totalCost
                 };
 
                 logic.SaveNewInvoice(newInvoice);
                 MessageBox.Show("Invoice created.");
+
+                LockInvoiceFields();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error creating invoice: " + ex.Message);
             }
         }
+
 
         /// edits the selected invoice when clicked
         private void btnEditInvoice_Click(object sender, RoutedEventArgs e)
@@ -178,6 +182,19 @@ namespace CS3280GroupProject
                 MessageBox.Show("Error updating invoice: " + ex.Message);
             }
         }
+
+        /// locks invoice fields so user can't edit them
+        private void LockInvoiceFields()
+        {
+            txtInvoiceNumber.IsReadOnly = true;
+            txtInvoiceDate.IsReadOnly = true;
+            txtTotalCost.IsReadOnly = true;
+            cmbItems.IsEnabled = false;
+            btnAddItem.IsEnabled = false;
+            btnRemoveItem.IsEnabled = false;
+            dgInvoiceItems.IsEnabled = false;
+        }
+
 
         /// adds the selected item to the invoice when the button is clicked
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
