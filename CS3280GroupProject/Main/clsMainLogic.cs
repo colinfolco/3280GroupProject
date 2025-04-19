@@ -150,12 +150,34 @@ namespace CS3280GroupProject.Main
         }
 
 
-        /// this was a placeholder but deleting it breaks things so i guess its here to stay.
         private List<Item> ExecuteSQLAndMapToItemList(string sqlQuery)
         {
             List<Item> items = new List<Item>();
+
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                int iRetVal = 0;
+                var ds = db.ExecuteSQLStatement(sqlQuery, ref iRetVal);
+
+                for (int i = 0; i < iRetVal; i++)
+                {
+                    var item = new Item
+                    {
+                        ItemName = ds.Tables[0].Rows[i]["ItemDesc"].ToString(),
+                        Price = decimal.Parse(ds.Tables[0].Rows[i]["Cost"].ToString())
+                    };
+                    items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("error loading items: " + ex.Message);
+            }
+
             return items;
         }
+
 
         /// edits an existing invoice and its items
         public void EditInvoice(clsInvoice oldInvoice, clsInvoice newInvoice)
