@@ -1,83 +1,103 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using CS3280GroupProject.Common;
 
 namespace CS3280GroupProject.Items
 {
+    /// <summary>
+    /// Handles business logic for item management operations
+    /// </summary>
     public class clsItemsLogic
     {
-        private clsItemsSQL _sql = new clsItemsSQL();
+        private readonly clsItemsSQL _sql = new clsItemsSQL();
+        private List<Item> _originalItems = new List<Item>();
 
+        /// <summary>
+        /// Loads all items from the database
+        /// </summary>
         public List<Item> LoadItems()
         {
-            List<Item> items = new List<Item>();
-
             try
             {
-                // get the sql string to select all items
-                string sqlQuery = _sql.GetAllItems();
+                var db = new clsDataAccess();
+                int numRows = 0;
+                var ds = db.ExecuteSQLStatement(_sql.GetAllItems(), ref numRows);
 
-                // create a data access object
-                var db = new CS3280GroupProject.Common.clsDataAccess();
-                int iRetVal = 0;
-
-                // execute the query
-                var ds = db.ExecuteSQLStatement(sqlQuery, ref iRetVal);
-
-                // loop through results
-                foreach (System.Data.DataRow row in ds.Tables[0].Rows)
+                _originalItems = ds.Tables[0].AsEnumerable().Select(row => new Item
                 {
-                    Item item = new Item
-                    {
-                        ItemID = row["ItemCode"].ToString(),
-                        ItemName = row["ItemDesc"].ToString(),
-                        Price = decimal.Parse(row["Cost"].ToString())
-                    };
-                    items.Add(item);
-                }
+                    ItemID = row["ItemCode"]?.ToString() ?? "",
+                    ItemName = row["ItemDesc"]?.ToString() ?? "",
+                    Price = decimal.Parse(row["Cost"]?.ToString() ?? "0")
+                }).ToList();
+
+                return new List<Item>(_originalItems);
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show("Error loading items: " + ex.Message);
+                HandleError("Error loading items", ex);
+                return new List<Item>();
             }
-
-            return items;
         }
-        /* i also edited this out to write something
-        public bool SaveChanges(List<Item> modifiedItems)
-        {
-            // Execute _sql.UpdateItem() for each modified item (not yet implemented)
-            return true;
-        }
-        */
 
-        public bool SaveChanges(List<Item> modifiedItems)
+        /// <summary>
+        /// Saves all changes to the database
+        /// </summary>
+        public bool SaveChanges(List<Item> currentItems)
         {
             try
             {
-                var db = new CS3280GroupProject.Common.clsDataAccess();
-                foreach (var item in modifiedItems)
+                var db = new clsDataAccess();
+                int rowsAffected = 0;
+
+                // Process updates and inserts
+                foreach (var item in currentItems)
                 {
-                    string sql = $"UPDATE ItemDesc SET ItemDesc = '{item.ItemName.Replace("'", "''")}', Cost = {item.Price} WHERE ItemCode = '{item.ItemID}'";
-                    int iRetVal = 0;
-                    db.ExecuteNonQuery(sql, ref iRetVal);
+                    if (_originalItems.Any(i => i.ItemID == item.ItemID))
+                    {
+                        db.ExecuteNonQuery(_sql.UpdateItem(item.ItemID, item.ItemName, item.Price), ref rowsAffected);
+                    }
+                    else
+                    {
+                        db.ExecuteNonQuery(_sql.InsertItem(item.ItemID, item.ItemName, item.Price), ref rowsAffected);
+                    }
+                }
+
+                // Process deletions
+                foreach (var originalItem in _originalItems)
+                {
+                    if (currentItems.All(i => i.ItemID != originalItem.ItemID))
+                    {
+                        var usageCount = db.ExecuteScalarSQL(_sql.CheckItemUsage(originalItem.ItemID));
+                        if (Convert.ToInt32(usageCount) > 0)
+                        {
+                            throw new Exception($"Item {originalItem.ItemID} is used in invoices and cannot be deleted");
+                        }
+                        db.ExecuteNonQuery(_sql.DeleteItem(originalItem.ItemID), ref rowsAffected);
+                    }
                 }
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                HandleError("Error saving items", ex);
                 return false;
             }
         }
 
+        private void HandleError(string context, Exception ex) =>
+            MessageBox.Show($"{context}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
+    /// <summary>
+    /// Represents an inventory item
+    /// </summary>
     public class Item
     {
-        public string ItemID { get; set; }  // <-- changed to string
-        public string ItemName { get; set; }
+        public string ItemID { get; set; } = string.Empty;
+        public string ItemName { get; set; } = string.Empty;
         public decimal Price { get; set; }
     }
 }
