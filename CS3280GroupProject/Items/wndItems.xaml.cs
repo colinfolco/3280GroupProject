@@ -54,6 +54,7 @@ namespace CS3280GroupProject.Items
         }
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
+            ItemsModified = true;
             // Placeholder method for btnAdd_Click
             // Implementation will be added later
         }

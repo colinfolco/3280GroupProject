@@ -8,11 +8,12 @@ namespace CS3280GroupProject.Items
 {
     public class clsItemsSQL
     {
-        // Get all items
+        // had to change this to work
         public string GetAllItems()
         {
-            return "SELECT ItemID, ItemName, Price FROM Items;";
+            return "SELECT * FROM ItemDesc";
         }
+
 
         // Update existing item
         public string UpdateItem(int itemID, string itemName, decimal price)

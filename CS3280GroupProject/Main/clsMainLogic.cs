@@ -101,23 +101,134 @@ namespace CS3280GroupProject.Main
             return items;
         }
 
-        /// edits an existing invoice.
+        /// edits an existing invoice and its items
         public void EditInvoice(clsInvoice oldInvoice, clsInvoice newInvoice)
         {
             try
             {
-                // get the SQL query neededto update the invoice
                 string sqlQuery = clsMainSQL.UpdateInvoice(newInvoice.InvoiceNumber.ToString(), newInvoice.TotalCost);
-
-                // execute the SQL query
                 ExecuteSQLNonQuery(sqlQuery);
-                MessageBox.Show("Invoice updated.");
+
+                DeleteLineItems(newInvoice.InvoiceNumber);
+
+                SaveLineItems(newInvoice.InvoiceNumber);
+
+                MessageBox.Show("Invoice updated successfully.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("Error updating invoice: " + ex.Message);
             }
         }
+
+        /// executes a scalar sql query and returns a single value
+        private string ExecuteSQLScalar(string sqlQuery)
+        {
+            var db = new CS3280GroupProject.Common.clsDataAccess();
+            var result = db.ExecuteScalarSQL(sqlQuery);
+
+            return result?.ToString() ?? "TBD";
+        }
+
+
+        /// retrieves the max invoice number from the database
+        public string GetMaxInvoiceNumber()
+        {
+            try
+            {
+                string sqlQuery = CS3280GroupProject.Main.clsMainSQL.GetMaxInvoiceNumber();
+                return ExecuteSQLScalar(sqlQuery);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error retrieving max invoice number: " + ex.Message);
+                return "TBD";
+            }
+        }
+
+        /// saves all the items for an invoice into the LineItems table
+        public void SaveLineItems(int invoiceNumber)
+        {
+            try
+            {
+                int lineItemNumber = 1;
+
+                foreach (var item in App.Current.Windows.OfType<MainWindow>().First().dgInvoiceItems.Items)
+                {
+                    if (item == null)
+                        continue;
+
+                    var itemName = (string)item.GetType().GetProperty("ItemName")?.GetValue(item, null);
+
+                    string itemCode = GetItemCodeFromName(itemName);
+
+                    string sqlQuery = $"INSERT INTO LineItems (InvoiceNum, LineItemNum, ItemCode) " +
+                                      $"VALUES ({invoiceNumber}, {lineItemNumber}, '{itemCode}')";
+
+                    ExecuteSQLNonQuery(sqlQuery);
+
+                    lineItemNumber++;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving line items: " + ex.Message);
+            }
+        }
+
+        /// looks up the item code based on item name
+        private string GetItemCodeFromName(string itemName)
+        {
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                int iRetVal = 0;
+
+                string sql = $"SELECT ItemCode FROM ItemDesc WHERE ItemDesc = '{itemName}'";
+
+                var ds = db.ExecuteSQLStatement(sql, ref iRetVal);
+
+                if (iRetVal > 0)
+                {
+                    return ds.Tables[0].Rows[0]["ItemCode"].ToString();
+                }
+                else
+                {
+                    throw new Exception("Item code not found for item name: " + itemName);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error looking up item code: " + ex.Message);
+                return "UNKNOWN";
+            }
+        }
+
+        /// deletes all line items for an invoice
+        private void DeleteLineItems(int invoiceNumber)
+        {
+            try
+            {
+                var db = new CS3280GroupProject.Common.clsDataAccess();
+                int iRetVal = 0;
+
+                string sql = $"DELETE FROM LineItems WHERE InvoiceNum = {invoiceNumber}";
+
+                db.ExecuteNonQuery(sql, ref iRetVal);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error deleting line items: " + ex.Message);
+            }
+        }
+
+
+
+
+
+
+
+
 
     }
 }

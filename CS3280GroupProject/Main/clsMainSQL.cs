@@ -48,5 +48,15 @@ namespace CS3280GroupProject.Main
         {
             return $"DELETE FROM Invoices WHERE InvoiceNum = '{invoiceNumber}'";
         }
+
+        /// retrieves the max invoice number
+        public static string GetMaxInvoiceNumber()
+        {
+            return "SELECT MAX(InvoiceNum) FROM Invoices";
+        }
+
+
+
     }
 }
+

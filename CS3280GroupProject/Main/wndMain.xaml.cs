@@ -110,15 +110,36 @@ namespace CS3280GroupProject
                 {
                     foreach (var item in items)
                     {
-                        cmbItems.Items.Add(item.ItemName);
+                        cmbItems.Items.Add(item);
                     }
+                    cmbItems.DisplayMemberPath = "ItemName";
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading items: " + ex.Message);
+                MessageBox.Show("error loading items: " + ex.Message);
             }
         }
+
+
+        /// when the selected item changes, update the cost textbox
+        private void cmbItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (cmbItems.SelectedItem != null)
+                {
+                    var selectedItem = (Item)cmbItems.SelectedItem; // cast directly to Item
+                    txtItemCost.Text = selectedItem.Price.ToString("0.00");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading item cost: " + ex.Message);
+            }
+        }
+
+
 
 
         /// displays invoice details
@@ -126,7 +147,8 @@ namespace CS3280GroupProject
         {
             txtInvoiceNumber.Text = invoice.InvoiceNumber.ToString();
             txtInvoiceDate.Text = invoice.InvoiceDate.ToShortDateString();
-            txtTotalCost.Text = invoice.TotalCost.ToString("C");
+            txtTotalCost.Text = invoice.TotalCost.ToString("0.00");
+            LockInvoiceFields();
         }
 
         /// creates a new invoice when clicked
@@ -147,9 +169,16 @@ namespace CS3280GroupProject
                 };
 
                 logic.SaveNewInvoice(newInvoice);
+                logic.SaveLineItems(int.Parse(logic.GetMaxInvoiceNumber()));
                 MessageBox.Show("Invoice created.");
 
+                string maxInvoiceNum = logic.GetMaxInvoiceNumber();
+                txtInvoiceNumber.Text = maxInvoiceNum;
+
                 LockInvoiceFields();
+                txtInvoiceNumber.Text = logic.GetMaxInvoiceNumber();
+                btnCreateInvoice.IsEnabled = false;
+
             }
             catch (Exception ex)
             {
@@ -157,31 +186,40 @@ namespace CS3280GroupProject
             }
         }
 
+        /// unlocks invoice fields so user can edit them
+        private void UnlockInvoiceFields()
+        {
+            txtInvoiceDate.IsReadOnly = false;
+            cmbItems.IsEnabled = true;
+            btnAddItem.IsEnabled = true;
+            btnRemoveItem.IsEnabled = true;
+            dgInvoiceItems.IsEnabled = true;
+        }
 
-        /// edits the selected invoice when clicked
+
+
+
+        /// unlocks the invoice fields for editing when clicked
         private void btnEditInvoice_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                int invoiceNumber = int.Parse(txtInvoiceNumber.Text);
-                DateTime invoiceDate = DateTime.Parse(txtInvoiceDate.Text);
-                double totalCost = double.Parse(txtTotalCost.Text);
-
-                var updatedInvoice = new CS3280GroupProject.Main.clsMainLogic.clsInvoice
-                {
-                    InvoiceNumber = invoiceNumber,
-                    InvoiceDate = invoiceDate,
-                    TotalCost = totalCost
-                };
-
-                logic.EditInvoice(updatedInvoice, updatedInvoice);
-                MessageBox.Show("Invoice updated.");
+                txtInvoiceNumber.IsReadOnly = false;
+                txtInvoiceDate.IsReadOnly = false;
+                txtTotalCost.IsReadOnly = false;
+                cmbItems.IsEnabled = true;
+                btnAddItem.IsEnabled = true;
+                btnRemoveItem.IsEnabled = true;
+                dgInvoiceItems.IsEnabled = true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error updating invoice: " + ex.Message);
+                MessageBox.Show("Error unlocking invoice fields: " + ex.Message);
             }
         }
+
+
+
 
         /// locks invoice fields so user can't edit them
         private void LockInvoiceFields()
@@ -196,41 +234,35 @@ namespace CS3280GroupProject
         }
 
 
-        /// adds the selected item to the invoice when the button is clicked
+        /// adds the selected item to the invoice when clicked
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (cmbItems.SelectedItem == null)
                 {
-                    MessageBox.Show("Please select an item to add.");
+                    MessageBox.Show("please select an item to add.");
                     return;
                 }
 
-                string selectedItem = cmbItems.SelectedItem.ToString();
-                double itemCost;
-
-                if (!double.TryParse(txtItemCost.Text, out itemCost))
-                {
-                    MessageBox.Show("Invalid cost.");
-                    return;
-                }
+                var selectedItem = (Item)cmbItems.SelectedItem;
 
                 var newItem = new
                 {
-                    ItemName = selectedItem,
-                    Cost = itemCost
+                    ItemName = selectedItem.ItemName,
+                    Cost = selectedItem.Price
                 };
 
                 dgInvoiceItems.Items.Add(newItem);
-
-                MessageBox.Show($"Item '{selectedItem}' added.");
+                UpdateTotalCost();
+                MessageBox.Show($"item '{selectedItem.ItemName}' added.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error adding item: " + ex.Message);
+                MessageBox.Show("error adding item: " + ex.Message);
             }
         }
+
 
         /// removes the selected item from the invoice when clicked
         private void btnRemoveItem_Click(object sender, RoutedEventArgs e)
@@ -244,6 +276,7 @@ namespace CS3280GroupProject
                 }
 
                 dgInvoiceItems.Items.Remove(dgInvoiceItems.SelectedItem);
+                UpdateTotalCost();
                 MessageBox.Show("Item removed");
             }
             catch (Exception ex)
@@ -251,6 +284,74 @@ namespace CS3280GroupProject
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
+
+        /// recalculates the total cost based on all items currently in the datagrid
+        private void UpdateTotalCost()
+        {
+            try
+            {
+                double total = 0;
+
+                foreach (var item in dgInvoiceItems.Items)
+                {
+                    if (item == null) continue;
+
+                    var costProperty = item.GetType().GetProperty("Cost");
+                    if (costProperty != null)
+                    {
+                        var costValue = costProperty.GetValue(item, null);
+                        if (costValue != null && double.TryParse(costValue.ToString(), out double cost))
+                        {
+                            total += cost;
+                        }
+                    }
+                }
+
+                txtTotalCost.Text = total.ToString("0.00");
+
+                int invoiceNumber;
+                if (int.TryParse(txtInvoiceNumber.Text, out invoiceNumber) && invoiceNumber != 0)
+                {
+                    var db = new CS3280GroupProject.Common.clsDataAccess();
+                    string sqlQuery = $"UPDATE Invoices SET TotalCost = {total} WHERE InvoiceNum = {invoiceNumber}";
+                    int iRetVal = 0;
+                    db.ExecuteNonQuery(sqlQuery, ref iRetVal);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error updating total cost in database: " + ex.Message);
+            }
+        }
+
+
+
+        /// updates the total cost in the database for the current invoice
+        private void UpdateTotalCostInDatabase()
+        {
+            try
+            {
+                if (txtInvoiceNumber.Text != "TBD")
+                {
+                    int invoiceNumber = int.Parse(txtInvoiceNumber.Text);
+                    double totalCost = double.Parse(txtTotalCost.Text);
+
+                    var sqlQuery = CS3280GroupProject.Main.clsMainSQL.UpdateInvoice(invoiceNumber.ToString(), totalCost);
+
+                    var db = new CS3280GroupProject.Common.clsDataAccess();
+                    int iRetVal = 0;
+                    db.ExecuteNonQuery(sqlQuery, ref iRetVal);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error updating total cost in database: " + ex.Message);
+            }
+        }
+
+
+
 
     }
 }

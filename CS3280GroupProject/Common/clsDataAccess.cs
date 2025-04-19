@@ -76,5 +76,57 @@ namespace CS3280GroupProject.Common
             }
         }
 
+        /// <summary>
+        /// Executes a scalar SQL statement and returns a single value.
+        /// </summary>
+        /// <param name="sSQL">The SQL query to execute.</param>
+        /// <returns>The result of the query as an object.</returns>
+        public object ExecuteScalarSQL(string sSQL)
+        {
+            try
+            {
+                using (OleDbConnection conn = new OleDbConnection(sConnectionString))
+                {
+                    conn.Open();
+                    using (OleDbCommand cmd = new OleDbCommand(sSQL, conn))
+                    {
+                        return cmd.ExecuteScalar();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." +
+                    MethodInfo.GetCurrentMethod().Name + " --> " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Executes a non-query SQL statement (like UPDATE, INSERT, DELETE).
+        /// </summary>
+        /// <param name="sSQL">The SQL query to execute.</param>
+        /// <param name="iRetVal">The number of rows affected.</param>
+        public void ExecuteNonQuery(string sSQL, ref int iRetVal)
+        {
+            try
+            {
+                using (OleDbConnection conn = new OleDbConnection(sConnectionString))
+                {
+                    conn.Open();
+                    using (OleDbCommand cmd = new OleDbCommand(sSQL, conn))
+                    {
+                        iRetVal = cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." +
+                    MethodInfo.GetCurrentMethod().Name + " --> " + ex.Message);
+            }
+        }
+
+
+
     }
 }
