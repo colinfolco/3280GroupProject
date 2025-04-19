@@ -10,7 +10,6 @@ namespace CS3280GroupProject.Main
 {
     internal class clsMainLogic
     {
-        /// represents an invoice
         internal class clsInvoice
         {
             public int InvoiceNumber { get; set; }
@@ -124,7 +123,7 @@ namespace CS3280GroupProject.Main
                         InvoiceNumber = int.Parse(row["InvoiceNum"].ToString()),
                         InvoiceDate = DateTime.Parse(row["InvoiceDate"].ToString()),
                         TotalCost = double.Parse(row["TotalCost"].ToString()),
-                        Items = new List<Items.Item>() // you can load items separately later if needed
+                        Items = new List<Items.Item>()
                     };
 
                     return invoice;
@@ -377,11 +376,11 @@ namespace CS3280GroupProject.Main
                 var db = new CS3280GroupProject.Common.clsDataAccess();
                 int iRetVal = 0;
 
-                // delete line items first
+                // delete items
                 string deleteLineItemsSQL = $"DELETE FROM LineItems WHERE InvoiceNum = {invoiceNumber}";
                 db.ExecuteNonQuery(deleteLineItemsSQL, ref iRetVal);
 
-                // then delete invoice
+                // delete invoice
                 string deleteInvoiceSQL = $"DELETE FROM Invoices WHERE InvoiceNum = {invoiceNumber}";
                 db.ExecuteNonQuery(deleteInvoiceSQL, ref iRetVal);
             }

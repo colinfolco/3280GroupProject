@@ -156,7 +156,7 @@ namespace CS3280GroupProject
             {
                 if (cmbItems.SelectedItem != null)
                 {
-                    var selectedItem = (Item)cmbItems.SelectedItem; // cast directly to Item
+                    var selectedItem = (Item)cmbItems.SelectedItem;
                     txtItemCost.Text = selectedItem.Price.ToString("0.00");
                 }
             }
@@ -222,17 +222,14 @@ namespace CS3280GroupProject
                     TotalCost = totalCost
                 };
 
-                // save the invoice first
                 logic.SaveNewInvoice(newInvoice);
 
-                // after saving, make sure we have a valid invoice number
                 if (newInvoice.InvoiceNumber == 0)
                 {
                     MessageBox.Show("error: invoice number could not be retrieved.");
                     return;
                 }
 
-                // then save the line items
                 logic.SaveLineItems(newInvoice.InvoiceNumber);
 
                 MessageBox.Show($"invoice {newInvoice.InvoiceNumber} saved successfully.");
@@ -285,7 +282,7 @@ namespace CS3280GroupProject
 
 
 
-        /// locks invoice fields so user can't edit them
+        /// locks invoice fields
         private void LockInvoiceFields()
         {
             txtInvoiceNumber.IsReadOnly = true;
@@ -297,7 +294,7 @@ namespace CS3280GroupProject
             dgInvoiceItems.IsEnabled = false;
         }
 
-        /// adds the selected item to the invoice when clicked
+        /// adds selected item to the invoice 
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -327,7 +324,7 @@ namespace CS3280GroupProject
         }
 
 
-        /// removes the selected item from the invoice when clicked
+        /// removes item from the invoice
         private void btnRemoveItem_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -348,7 +345,7 @@ namespace CS3280GroupProject
             }
         }
 
-        /// recalculates the total cost based on all items currently in the datagrid
+        /// recalculates the total cost based on all items
         private void UpdateTotalCost()
         {
             try
@@ -465,7 +462,6 @@ namespace CS3280GroupProject
 
                     MessageBox.Show("invoice deleted");
 
-                    // clear fields after deleting
                     ClearInvoiceFields();
                 }
             }
