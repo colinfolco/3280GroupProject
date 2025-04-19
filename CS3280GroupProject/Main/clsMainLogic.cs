@@ -31,8 +31,8 @@ namespace CS3280GroupProject.Main
                 Items = items;
             }
         }
+        
 
-        /// retrieves a list of all items from the database.
         public List<Item> GetAllItems()
         {
             try

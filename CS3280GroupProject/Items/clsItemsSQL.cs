@@ -14,7 +14,6 @@ namespace CS3280GroupProject.Items
             return "SELECT * FROM ItemDesc";
         }
 
-
         // Update existing item
         public string UpdateItem(int itemID, string itemName, decimal price)
         {
