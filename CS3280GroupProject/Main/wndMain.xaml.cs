@@ -35,7 +35,9 @@ namespace CS3280GroupProject
 
         }
 
+        /// <summary>
         /// opens the items window and updates the combo box
+        /// </summary>
         private void btnEditItems_Click(object sender, RoutedEventArgs e)
         {
             var itemsWindow = new CS3280GroupProject.Items.wndItems();
@@ -60,6 +62,10 @@ namespace CS3280GroupProject
         // you may make changes as required
 
         // all good. i had to edit it a lot so i hope everything still works everywhere? i haven't noticed any issues.
+
+        /// <summary>
+        /// open the search window, retrieve the selected invoice, and display it
+        /// </summary>
         private void btnSearchInvoice_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -124,7 +130,11 @@ namespace CS3280GroupProject
 
         //--------------------------------------------------------------------------------------------------------------------------
 
+
+
+        /// <summary>
         /// loads items into the combo box
+        /// </summary>
         private void LoadItemsComboBox()
         {
             try
@@ -149,7 +159,9 @@ namespace CS3280GroupProject
 
 
 
+        /// <summary>
         /// when the selected item changes update the cost textbox
+        /// </summary>
         private void cmbItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -167,7 +179,10 @@ namespace CS3280GroupProject
         }
 
 
+
+        /// <summary>
         /// displays invoice details
+        /// </summary>
         private void DisplayInvoiceDetails(CS3280GroupProject.Main.clsMainLogic.clsInvoice invoice)
         {
             txtInvoiceNumber.Text = invoice.InvoiceNumber.ToString();
@@ -178,7 +193,10 @@ namespace CS3280GroupProject
             LoadInvoiceItems(invoice.InvoiceNumber);
         }
 
+
+        /// <summary>
         /// the most painful button of all. creates an invoice
+        /// </summary>
         private void btnCreateInvoice_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -245,7 +263,10 @@ namespace CS3280GroupProject
         }
 
 
+
+        /// <summary>
         /// unlocks invoice fields so user can edit them
+        /// </summary>
         private void UnlockInvoiceFields()
         {
             txtInvoiceDate.IsReadOnly = false;
@@ -258,7 +279,9 @@ namespace CS3280GroupProject
 
 
 
+        /// <summary>
         /// unlocks the invoice fields for editing when clicked
+        /// </summary>
         private void btnEditInvoice_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -280,9 +303,9 @@ namespace CS3280GroupProject
         }
 
 
-
-
+        /// <summary>
         /// locks invoice fields
+        /// </summary>
         private void LockInvoiceFields()
         {
             txtInvoiceNumber.IsReadOnly = true;
@@ -294,7 +317,10 @@ namespace CS3280GroupProject
             dgInvoiceItems.IsEnabled = false;
         }
 
-        /// adds selected item to the invoice 
+
+        /// <summary>
+        /// add selected item to the invoice
+        /// </summary>
         private void btnAddItem_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -324,7 +350,9 @@ namespace CS3280GroupProject
         }
 
 
+        /// <summary>
         /// removes item from the invoice
+        /// </summary>
         private void btnRemoveItem_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -345,7 +373,10 @@ namespace CS3280GroupProject
             }
         }
 
-        /// recalculates the total cost based on all items
+
+        /// <summary>
+        /// re calculates the total cost in an invoice
+        /// </summary>
         private void UpdateTotalCost()
         {
             try
@@ -385,7 +416,9 @@ namespace CS3280GroupProject
 
 
 
+        /// <summary>
         /// updates the total cost in the database for the current invoice
+        /// </summary>
         private void UpdateTotalCostInDatabase()
         {
             try
@@ -407,6 +440,9 @@ namespace CS3280GroupProject
 
 
         /// loads all items for a specific invoice into the datagrid
+        /// <summary>
+        /// unlocks invoice fields so user can edit them
+        /// </summary>
         private void LoadInvoiceItems(int invoiceNum)
         {
             try
@@ -431,7 +467,10 @@ namespace CS3280GroupProject
         }
 
 
+
+        /// <summary>
         /// clears invoice fields
+        /// </summary>
         private void ClearInvoiceFields()
         {
             txtInvoiceNumber.Text = "";
@@ -441,7 +480,9 @@ namespace CS3280GroupProject
         }
 
 
+        /// <summary>
         /// deletes the currently loaded invoice
+        /// </summary>
         private void btnDeleteInvoice_Click(object sender, RoutedEventArgs e)
         {
             try

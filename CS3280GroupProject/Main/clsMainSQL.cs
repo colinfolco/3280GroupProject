@@ -18,20 +18,27 @@ namespace CS3280GroupProject.Main
 {
     internal class clsMainSQL
     {
-        /// retrieves invoice data by invoice number.
+        /// <summary>
+        /// gets invoice data by invoice number
+        /// </summary>
         public static string GetInvoiceData(string invoiceNumber)
         {
             return $"SELECT * FROM Invoices WHERE InvoiceNum = {invoiceNumber}";
         }
 
 
-        /// retrieves all invoices.
+
+        /// <summary>
+        /// get all the invoices...
+        /// </summary>
         public static string GetAllInvoices()
         {
             return "SELECT InvoiceNum, InvoiceDate, TotalCost FROM Invoices";
         }
 
-        /// inserts a new invoice.
+        /// <summary>
+        /// inserts a new invoice
+        /// </summary>
         public static string InsertNewInvoice(DateTime invoiceDate, double totalCost)
         {
             return $"INSERT INTO Invoices (InvoiceDate, TotalCost) " +
@@ -39,20 +46,26 @@ namespace CS3280GroupProject.Main
         }
 
 
-        /// updates the total cost of an invoice.
+        /// <summary>
+        /// updates the total cost of an invoice
+        /// </summary>
         public static string UpdateInvoice(string invoiceNumber, double newTotal)
         {
             return $"UPDATE Invoices SET TotalCost = {newTotal} WHERE InvoiceNum = {invoiceNumber}";
         }
 
 
-        /// deletes an invoice by invoice number.
+        /// <summary>
+        /// deletes an invoice by invoice number
+        /// </summary>
         public static string DeleteInvoice(string invoiceNumber)
         {
             return $"DELETE FROM Invoices WHERE InvoiceNum = '{invoiceNumber}'";
         }
 
-        /// retrieves the max invoice number
+        /// <summary>
+        /// get the max invoice number
+        /// </summary>
         public static string GetMaxInvoiceNumber()
         {
             return "SELECT MAX(InvoiceNum) FROM Invoices";

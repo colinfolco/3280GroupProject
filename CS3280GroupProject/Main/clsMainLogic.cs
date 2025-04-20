@@ -30,8 +30,10 @@ namespace CS3280GroupProject.Main
                 Items = items;
             }
         }
-        
 
+        /// <summary>
+        /// gets everything from the database
+        /// </summary>
         public List<Item> GetAllItems()
         {
             try
@@ -49,7 +51,9 @@ namespace CS3280GroupProject.Main
         }
 
 
-        /// saves or updates an invoice
+        /// <summary>
+        /// save/update invoice
+        /// </summary>
         public void SaveNewInvoice(clsInvoice invoice)
         {
             try
@@ -89,7 +93,9 @@ namespace CS3280GroupProject.Main
 
 
 
-        /// retrieves an invoice by invoice number.
+        /// <summary>
+        /// get invoice by its invoice number
+        /// </summary>
         public clsInvoice GetInvoice(string invoiceNumber)
         {
             try
@@ -106,6 +112,10 @@ namespace CS3280GroupProject.Main
             }
         }
 
+
+        /// <summary>
+        /// executes a sql query and maps the first result row to an invoice
+        /// </summary>
         private clsInvoice ExecuteSQLAndMapToInvoice(string sqlQuery)
         {
             try
@@ -140,7 +150,9 @@ namespace CS3280GroupProject.Main
             }
         }
 
-        
+        /// <summary>
+        /// executes a sql query that does not return any results
+        /// </summary>
         private void ExecuteSQLNonQuery(string sqlQuery)
         {
             var db = new CS3280GroupProject.Common.clsDataAccess();
@@ -148,7 +160,9 @@ namespace CS3280GroupProject.Main
             db.ExecuteNonQuery(sqlQuery, ref iRetVal);
         }
 
-
+        /// <summary>
+        /// runs a sql thing and makes a list of items from whatever comes back
+        /// </summary>
         private List<Item> ExecuteSQLAndMapToItemList(string sqlQuery)
         {
             List<Item> items = new List<Item>();
@@ -178,7 +192,10 @@ namespace CS3280GroupProject.Main
         }
 
 
+
+        /// <summary>
         /// edits an existing invoice and its items
+        /// </summary>
         public void EditInvoice(clsInvoice oldInvoice, clsInvoice newInvoice)
         {
             try
@@ -198,7 +215,9 @@ namespace CS3280GroupProject.Main
             }
         }
 
+        /// <summary>
         /// executes a scalar sql query and returns a single value
+        /// </summary>
         private string ExecuteSQLScalar(string sqlQuery)
         {
             var db = new CS3280GroupProject.Common.clsDataAccess();
@@ -208,7 +227,9 @@ namespace CS3280GroupProject.Main
         }
 
 
+        /// <summary>
         /// retrieves the max invoice number from the database
+        /// </summary>
         public string GetMaxInvoiceNumber()
         {
             try
@@ -223,7 +244,10 @@ namespace CS3280GroupProject.Main
             }
         }
 
-        /// saves all the items for an invoice into the LineItems table
+
+        /// <summary>
+        /// saves all the items for an invoice into the line items table
+        /// </summary>
         public void SaveLineItems(int invoiceNumber)
         {
             try
@@ -256,7 +280,9 @@ namespace CS3280GroupProject.Main
         }
 
 
-        /// looks up the item code based on item name
+        /// <summary>
+        /// looks up the item code from the item name
+        /// </summary>
         private string GetItemCodeFromName(string itemName)
         {
             try
@@ -284,7 +310,10 @@ namespace CS3280GroupProject.Main
             }
         }
 
+
+        /// <summary>
         /// deletes all line items for an invoice
+        /// </summary>
         public void DeleteLineItems(int invoiceNumber)
         {
             try
@@ -302,7 +331,10 @@ namespace CS3280GroupProject.Main
             }
         }
 
-        /// uh. gets items for the combo box
+
+        /// <summary>
+        /// gets the items for the combo box
+        /// </summary>
         public List<Item> GetItemsForComboBox()
         {
             try
@@ -317,7 +349,9 @@ namespace CS3280GroupProject.Main
             }
         }
 
+        /// <summary>
         /// get the items on an invoice
+        /// </summary>
         public List<Item> GetItemsOnInvoice(int invoiceNum)
         {
             List<Item> invoiceItems = new List<Item>();
@@ -352,7 +386,9 @@ namespace CS3280GroupProject.Main
             return invoiceItems;
         }
 
+        /// <summary>
         /// updates the total cost for a specific invoice
+        /// </summary>
         public void UpdateInvoiceTotal(int invoiceNumber, double newTotalCost)
         {
             try
@@ -368,7 +404,10 @@ namespace CS3280GroupProject.Main
             }
         }
 
-        /// Deletes an invoice and its related line items
+
+        /// <summary>
+        /// deletes an invoice and its related line items
+        /// </summary>
         public void DeleteInvoice(int invoiceNumber)
         {
             try
